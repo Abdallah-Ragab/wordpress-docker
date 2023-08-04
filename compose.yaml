@@ -1,0 +1,35 @@
+services:
+  mysql:
+    image: mysql:latest
+    networks:
+      - wpnet
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABAE=wordpress
+  wordpress:
+    image: wordpress:latest
+    networks:
+      - wpnet        
+    ports:
+      - '80:80'
+    depends_on:
+      - mysql
+    environment:
+      - WORDPRESS_DB_HOST=mysql
+      - WORDPRESS_DB_USER=root
+      - WORDPRESS_DB_PASSWORD=root
+      - WORDPRESS_DB_NAME=wordpress
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok.yml"
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - 4040:4040
+networks:
+  wpnet:
